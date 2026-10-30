@@ -70,5 +70,55 @@
       "${1:s}.order_of_key(${2:x})  // 0-indexed rank: count of elements strictly < x"
     ],
     "description": "Query 0-indexed rank (number of elements strictly < x) via PBDS."
+  },
+  "PBDS Multiset: Safe Erase One Element": {
+    "prefix": [
+      "cp-pbds-safe-erase",
+      "cp-pbds-erase-one"
+    ],
+    "body": [
+      "// Safely erases ONE copy of x from pbds_multiset (s.erase(x) is broken in pb_ds)",
+      "auto ${1:it} = ${2:ms}.find_by_order(${2:ms}.order_of_key(${3:x}));",
+      "if (${1:it} != ${2:ms}.end() && *${1:it} == ${3:x}) {",
+      "    ${2:ms}.erase(${1:it});",
+      "}"
+    ],
+    "description": "Safely erases one copy of an element from GNU PBDS multiset by iterator."
+  },
+  "PBDS Multiset via Pairs (Safer Multiset Simulation)": {
+    "prefix": [
+      "cp-pbds-pair-multiset"
+    ],
+    "body": [
+      "// Simulating multiset via ordered_set of pairs with unique IDs (avoids pb_ds less_equal bugs)",
+      "pbds_set<pair<int, int>> ${1:s};",
+      "int ${2:id} = 0;",
+      "",
+      "// Insert a copy of x",
+      "${1:s}.insert({${3:x}, ${2:id}++});",
+      "",
+      "// Count of values < x",
+      "int cnt_lt = ${1:s}.order_of_key({${3:x}, -1});",
+      "",
+      "// Count of values <= x",
+      "int cnt_le = ${1:s}.order_of_key({${3:x}, INT_MAX});"
+    ],
+    "description": "Simulate an ordered multiset safely using pbds_set<pair<int, int>> with unique timestamps."
+  },
+  "PBDS: Inversion Counting": {
+    "prefix": [
+      "cp-pbds-inversions",
+      "cp-inversion-pbds"
+    ],
+    "body": [
+      "// Counts inversions in array a of size n using PBDS pair ordered set in O(n log n)",
+      "pbds_set<pair<int, int>> ${1:s};",
+      "long long ${2:inv} = 0;",
+      "for (int i = 0; i < (int)${3:a}.size(); i++) {",
+      "    ${2:inv} += ${1:s}.size() - ${1:s}.order_of_key({${3:a}[i], INT_MAX});",
+      "    ${1:s}.insert({${3:a}[i], i});",
+      "}"
+    ],
+    "description": "Counts array inversions in O(n log n) using GNU PBDS pair ordered set."
   }
 }

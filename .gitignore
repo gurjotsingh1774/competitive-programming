@@ -5,10 +5,10 @@
 *.o
 *.out
 *.exe
-K_Query_Online
 
 # Test files and artifacts
 input.txt
 output.txt
 failing_*.txt
 *.log
+cp-library
