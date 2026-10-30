@@ -1,9 +1,6 @@
 {
   "Integer Points & Vector Operations": {
-    "prefix": [
-      "cp-geometry-point",
-      "cp-point-2d"
-    ],
+    "prefix": "cp-geom-point-2d",
     "body": [
       "struct Pt {",
       "    ll x = 0, y = 0;",
@@ -21,13 +18,10 @@
       "inline ll dist2(Pt a, Pt b) { return dot(a - b, a - b); }",
       "inline int sgn(ll v) { return (v > 0) - (v < 0); }"
     ],
-    "description": "Integer arithmetic avoids floating-point roundoff errors. Coordinates up to |x|, |y| ≤ 10^9 guarantee that dot and cross products fit inside signed 64-bit integers (ll). - **cross(a, b)**: a.x · b.y - a.y · b.x. - **c..."
+    "description": "Integer-exact 2D point struct with dot product, cross product, orientation test, and distance."
   },
-  "Convex Hull (Andrew’s Monotone Chain)": {
-    "prefix": [
-      "cp-convex-hull",
-      "cp-monotone-chain"
-    ],
+  "Convex Hull (Andrew\u2019s Monotone Chain)": {
+    "prefix": "cp-geom-convex-hull",
     "body": [
       "// Returns counter-clockwise hull, lowest-leftmost first. No collinear points.",
       "inline vector<Pt> convex_hull(vector<Pt> p) {",
@@ -49,14 +43,10 @@
       "    return h;",
       "}"
     ],
-    "description": "Computes the strictly enclosing convex hull of a set of 2D points. Sorts points by x then y, builds lower and upper hulls in counter-clockwise order, and discards interior and collinear points. | Complexity: - **Time ..."
+    "description": "Andrew\u2019s monotone chain convex hull algorithm sorting points in O(n log n) time."
   },
   "Polygon Area (Shoelace Formula)": {
-    "prefix": [
-      "cp-shoelace",
-      "cp-shoelace-formula",
-      "cp-polygon-area"
-    ],
+    "prefix": "cp-geom-shoelace",
     "body": [
       "// Twice the signed area (positive for counter-clockwise polygons).",
       "inline ll polygon_area2(const vector<Pt> &p) {",
@@ -66,13 +56,10 @@
       "    return s;",
       "}"
     ],
-    "description": "Computes twice the signed area of any simple polygon with integer vertices. Returns a positive value for counter-clockwise orientation and negative for clockwise. | Complexity: - **Time Complexity:** O(n) - **Space Co..."
+    "description": "Computes 2 * signed area of a simple polygon via the Shoelace formula in O(n) time."
   },
   "Segment Intersection & Collinearity": {
-    "prefix": [
-      "cp-segment-intersection",
-      "cp-geom-intersect"
-    ],
+    "prefix": "cp-geom-intersect",
     "body": [
       "inline bool on_segment(Pt a, Pt b, Pt p) {",
       "    return cross(a, b, p) == 0 &&",
@@ -89,13 +76,10 @@
       "           on_segment(c, d, a) || on_segment(c, d, b);",
       "}"
     ],
-    "description": "Determines whether two closed line segments [a, b] and [c, d] intersect (including endpoint touches and collinear overlapping segments). | Complexity: - **Time Complexity:** O(1) - **Space Complexity:** O(1)"
+    "description": "Determines if closed segments [a, b] and [c, d] intersect (including collinear cases) in O(1)."
   },
   "Point in Polygon (Ray Casting)": {
-    "prefix": [
-      "cp-point-in-polygon",
-      "cp-ray-casting"
-    ],
+    "prefix": "cp-geom-pip",
     "body": [
       "inline int point_in_polygon(const vector<Pt> &poly, Pt p) {",
       "    bool in = false;",
@@ -111,13 +95,10 @@
       "    return in ? 2 : 0;",
       "}"
     ],
-    "description": "Tests whether query point p lies inside, on the boundary, or outside an arbitrary simple polygon in O(n) time by casting a horizontal ray to +∈fty and counting parity of edge crossings. - Returns 0: Strictly outside -..."
+    "description": "Tests whether point p is outside (0), on boundary (1), or inside (2) polygon in O(n) time."
   },
   "Closest Pair of Points (Sweep-line)": {
-    "prefix": [
-      "cp-closest-pair",
-      "cp-closest-points"
-    ],
+    "prefix": "cp-geom-closest-pair",
     "body": [
       "inline ll closest_pair_dist2(vector<Pt> p) {",
       "    sort(p.begin(), p.end());",
@@ -139,13 +120,10 @@
       "    return best;",
       "}"
     ],
-    "description": "Finds the minimum Euclidean squared distance among all pairs in a set of n points using an x-coordinate sweep-line with a balanced binary search tree (std::set ordered by y). | Complexity: - **Time Complexity:** O(n l..."
+    "description": "Finds minimum Euclidean squared distance between all pairs in O(n log n) via sweep-line."
   },
   "Jarvis March (Gift Wrapping Algorithm)": {
-    "prefix": [
-      "cp-jarvis-march",
-      "cp-gift-wrapping"
-    ],
+    "prefix": "cp-geom-jarvis-march",
     "body": [
       "vector<Pt> jarvisMarch(vector<Pt> points) {",
       "    int n = points.size();",
@@ -172,12 +150,10 @@
       "    return hull;",
       "}"
     ],
-    "description": "Computes the convex hull by starting at the leftmost point and repeatedly finding the next point that makes the widest counter-clockwise turn. Optimal when the number of hull vertices h is small (h \\ll n). | Complexit..."
+    "description": "Computes convex hull in O(n * h) time where h is the number of vertices on the hull."
   },
   "Graham Scan Convex Hull": {
-    "prefix": [
-      "cp-graham-scan"
-    ],
+    "prefix": "cp-geom-graham-scan",
     "body": [
       "vector<Pt> grahamScan(vector<Pt> pts) {",
       "    int n = pts.size();",
@@ -208,6 +184,6 @@
       "    return st;",
       "}"
     ],
-    "description": "Finds the lowest point as a pivot, sorts remaining points radially by polar angle with respect to the pivot, and uses a stack to build the convex hull in a single pass. | Complexity: - **Time Complexity:** O(n log n) ..."
+    "description": "Finds convex hull via radial angle sorting from pivot and single-pass stack in O(n log n)."
   }
 }

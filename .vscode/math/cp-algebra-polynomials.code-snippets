@@ -1,8 +1,156 @@
 {
-  "Number Theoretic Transform (NTT)": {
-    "prefix": [
-      "cp-ntt"
+  "Linear XOR Basis": {
+    "prefix": "cp-alg-xor-basis",
+    "body": [
+      "// XorBasis: linear basis over GF(2) for values < 2^B. insert O(B), queries O(B).",
+      "template <int B = 60> struct XorBasis {",
+      "    ll b[B] = {};",
+      "    int rank_ = 0;",
+      "    bool insert(ll x) {  // true if x was independent",
+      "        for (int i = B - 1; i >= 0; i--) {",
+      "            if (!(x >> i & 1)) continue;",
+      "            if (!b[i]) { b[i] = x, rank_++; return true; }",
+      "            x ^= b[i];",
+      "        }",
+      "        return false;",
+      "    }",
+      "    bool contains(ll x) const {",
+      "        for (int i = B - 1; i >= 0; i--) if ((x >> i & 1) && b[i]) x ^= b[i];",
+      "        return x == 0;",
+      "    }",
+      "    ll max_xor(ll start = 0) const {  // maximum of start ^ (any subset xor)",
+      "        ll r = start;",
+      "        for (int i = B - 1; i >= 0; i--) if (b[i] && (r ^ b[i]) > r) r ^= b[i];",
+      "        return r;",
+      "    }",
+      "    int rank() const { return rank_; }",
+      "    // k-th smallest (0-indexed) element of the span, which has 2^rank elements (0 is smallest)",
+      "    ll kth_smallest(ll k) const {",
+      "        vector<ll> v;  // reduced basis, ascending by leading bit",
+      "        ll c[B];",
+      "        copy(b, b + B, c);",
+      "        for (int i = 0; i < B; i++)",
+      "            for (int j = 0; j < i; j++)",
+      "                if ((c[i] >> j & 1) && c[j]) c[i] ^= c[j];",
+      "        for (int i = 0; i < B; i++) if (c[i]) v.push_back(c[i]);",
+      "        ll r = 0;",
+      "        for (size_t i = 0; i < v.size(); i++) if (k >> i & 1) r ^= v[i];",
+      "        return r;",
+      "    }",
+      "};"
     ],
+    "description": "Linear vector basis over GF(2) for B-bit integers. Solves maximum XOR and k-th smallest XOR query."
+  },
+  "Matrix Algebra and Exponentiation": {
+    "prefix": "cp-alg-matrix",
+    "body": [
+      "struct Matrix {",
+      "    int n, m;",
+      "    vector<vector<mint>> a;",
+      "    Matrix(int n_ = 0, int m_ = 0) : n(n_), m(m_), a(n_, vector<mint>(m_, 0)) {}",
+      "    static Matrix identity(int n) { Matrix r(n, n); for (int i = 0; i < n; i++) r.a[i][i] = 1; return r; }",
+      "    Matrix operator*(const Matrix &o) const {",
+      "        Matrix r(n, o.m);",
+      "        for (int i = 0; i < n; i++)",
+      "            for (int k = 0; k < m; k++)",
+      "                if (a[i][k].x)",
+      "                    for (int j = 0; j < o.m; j++)",
+      "                        r.a[i][j] += a[i][k] * o.a[k][j];",
+      "        return r;",
+      "    }",
+      "    Matrix power(ll e) const {",
+      "        Matrix r = identity(n), b = *this;",
+      "        for (; e; e >>= 1, b = b * b) if (e & 1) r = r * b;",
+      "        return r;",
+      "    }",
+      "    mint det() const {",
+      "        Matrix t = *this;",
+      "        mint d = 1;",
+      "        for (int c = 0; c < n; c++) {",
+      "            int p = -1;",
+      "            for (int r = c; r < n; r++) if (t.a[r][c].x) { p = r; break; }",
+      "            if (p < 0) return 0;",
+      "            if (p != c) swap(t.a[p], t.a[c]), d = -d;",
+      "            d *= t.a[c][c];",
+      "            mint iv = t.a[c][c].inv();",
+      "            for (int r = c + 1; r < n; r++) {",
+      "                mint f = t.a[r][c] * iv;",
+      "                if (f.x) for (int k = c; k < n; k++) t.a[r][k] -= f * t.a[c][k];",
+      "            }",
+      "        }",
+      "        return d;",
+      "    }",
+      "    int rank() const {",
+      "        Matrix t = *this;",
+      "        int rk = 0;",
+      "        for (int c = 0; c < m && rk < n; c++) {",
+      "            int p = -1;",
+      "            for (int r = rk; r < n; r++) if (t.a[r][c].x) { p = r; break; }",
+      "            if (p < 0) continue;",
+      "            swap(t.a[p], t.a[rk]);",
+      "            mint iv = t.a[rk][c].inv();",
+      "            for (int r = rk + 1; r < n; r++) {",
+      "                mint f = t.a[r][c] * iv;",
+      "                if (f.x) for (int k = c; k < m; k++) t.a[r][k] -= f * t.a[rk][k];",
+      "            }",
+      "            rk++;",
+      "        }",
+      "        return rk;",
+      "    }",
+      "    bool inverse(Matrix &out) const {",
+      "        Matrix t = *this;",
+      "        out = identity(n);",
+      "        for (int c = 0; c < n; c++) {",
+      "            int p = -1;",
+      "            for (int r = c; r < n; r++) if (t.a[r][c].x) { p = r; break; }",
+      "            if (p < 0) return false;",
+      "            swap(t.a[p], t.a[c]), swap(out.a[p], out.a[c]);",
+      "            mint iv = t.a[c][c].inv();",
+      "            for (int k = 0; k < n; k++) t.a[c][k] *= iv, out.a[c][k] *= iv;",
+      "            for (int r = 0; r < n; r++) if (r != c && t.a[r][c].x) {",
+      "                mint f = t.a[r][c];",
+      "                for (int k = 0; k < n; k++)",
+      "                    t.a[r][k] -= f * t.a[c][k], out.a[r][k] -= f * out.a[c][k];",
+      "            }",
+      "        }",
+      "        return true;",
+      "    }",
+      "};"
+    ],
+    "description": "Matrix struct with cache-optimized multiplication and binary exponentiation over mint."
+  },
+  "Solving Linear Systems (Gaussian Elimination)": {
+    "prefix": "cp-alg-solve-linear",
+    "body": [
+      "// Solves A x = b over Z_p. Returns false if inconsistent; otherwise one solution.",
+      "inline bool solve_linear(Matrix A, vector<mint> b, vector<mint> &x) {",
+      "    int n = A.n, m = A.m;",
+      "    for (int i = 0; i < n; i++) A.a[i].push_back(b[i]);",
+      "    vector<int> where(m, -1);",
+      "    int row = 0;",
+      "    for (int c = 0; c < m && row < n; c++) {",
+      "        int p = -1;",
+      "        for (int r = row; r < n; r++) if (A.a[r][c].x) { p = r; break; }",
+      "        if (p < 0) continue;",
+      "        swap(A.a[p], A.a[row]);",
+      "        mint iv = A.a[row][c].inv();",
+      "        for (int k = c; k <= m; k++) A.a[row][k] *= iv;",
+      "        for (int r = 0; r < n; r++) if (r != row && A.a[r][c].x) {",
+      "            mint f = A.a[r][c];",
+      "            for (int k = c; k <= m; k++) A.a[r][k] -= f * A.a[row][k];",
+      "        }",
+      "        where[c] = row++;",
+      "    }",
+      "    for (int r = row; r < n; r++) if (A.a[r][m].x) return false;",
+      "    x.assign(m, 0);",
+      "    for (int c = 0; c < m; c++) if (where[c] >= 0) x[c] = A.a[where[c]][m];",
+      "    return true;",
+      "}"
+    ],
+    "description": "Solves matrix equation A*x = b over Z_p using Gaussian elimination with rank and solution analysis."
+  },
+  "Number Theoretic Transform (NTT)": {
+    "prefix": "cp-poly-ntt",
     "body": [
       "static_assert(mod == 998244353, \"poly.md needs MOD_VALUE 998244353 for NTT\");",
       "",
@@ -29,13 +177,10 @@
       "    if (invert) { mint ni = mint(n).inv(); for (auto &x : a) x *= ni; }",
       "}"
     ],
-    "description": "Computes the discrete Fourier transform over the finite field \\mathbb{Z}_{998244353}. Operates in-place on vectors of size equal to a power of two using radix-2 Cooley-Tukey bit reversal and butterfly operations. | Co..."
+    "description": "Computes NTT modulo 998244353 in-place in O(N log N) time."
   },
   "Polynomial Convolution": {
-    "prefix": [
-      "cp-convolution",
-      "cp-poly-mult"
-    ],
+    "prefix": "cp-poly-conv",
     "body": [
       "inline vector<mint> convolution(vector<mint> a, vector<mint> b) {",
       "    if (a.empty() || b.empty()) return {};",
@@ -57,13 +202,10 @@
       "    return a;",
       "}"
     ],
-    "description": "Multiplies two polynomials A(x) and B(x) modulo 998244353. Falls back to naive O(n \u00b7 m) schoolbook multiplication for small inputs (\u2264 16) to eliminate transform overhead. | Complexity: - **Time Complexity:** O((n + m)..."
+    "description": "Multiplies two polynomials A(x) and B(x) modulo 998244353 using NTT in O((n+m) log(n+m))."
   },
   "Polynomial Inverse Series": {
-    "prefix": [
-      "cp-poly-inverse",
-      "cp-poly-inv"
-    ],
+    "prefix": "cp-poly-inv",
     "body": [
       "inline vector<mint> poly_inverse(const vector<mint> &f, int n) {",
       "    vector<mint> g = {f[0].inv()};",
@@ -80,13 +222,10 @@
       "    return g;",
       "}"
     ],
-    "description": "Computes the formal power series inverse g(x) such that f(x) \u00b7 g(x) \\equiv 1 \u00b1od{x^n} via Newton-Raphson iteration: g_{k+1} \\equiv g_k(2 - f \u00b7 g_k) \u00b1od{x^{2k}}. Requires f[0] \\ne 0. | Complexity: - **Time Complexity:*..."
+    "description": "Computes formal power series inverse g(x) such that f(x)*g(x) = 1 (mod x^deg) via Newton inversion."
   },
   "Lagrange Interpolation (Consecutive Points)": {
-    "prefix": [
-      "cp-lagrange",
-      "cp-lagrange-interpolation"
-    ],
+    "prefix": "cp-poly-lagrange",
     "body": [
       "inline mint lagrange_consecutive(const vector<mint> &y, mint x) {",
       "    int n = y.size();",
@@ -106,13 +245,10 @@
       "    return res;",
       "}"
     ],
-    "description": "Evaluates a degree d polynomial at an arbitrary query point x given its evaluations at consecutive integer coordinates y[i] = f(i) for i = 0 ... d. Uses prefix and suffix product tables to achieve O(d) linear time ins..."
+    "description": "Evaluates degree-d polynomial at query point x from values at 0, 1, ..., d in O(d) time."
   },
-  "kth Term of Linear Recurrence (Bostan-Mori / Fiduccia)": {
-    "prefix": [
-      "cp-bostan-mori",
-      "cp-linear-recurrence"
-    ],
+  "kth Term of Linear Recurrence (Bostan-Mori)": {
+    "prefix": "cp-poly-bostan-mori",
     "body": [
       "inline mint kth_term(const vector<mint> &c, const vector<mint> &a, ll k) {",
       "    int d = c.size();",
@@ -140,13 +276,10 @@
       "    return ans;",
       "}"
     ],
-    "description": "Finds the k-th term (0-indexed) of a linear recurrence a_n = \\sum_{i < d} c[i] \u00b7 a_{n-1-i} given initial values a_0 ... a_{d-1} without constructing or multiplying matrices. Operates by polynomial modulo multiplicatio..."
+    "description": "Finds k-th term of linear recurrence in O(d log d log k) via polynomial modulo exponentiation."
   },
   "Complex Fast Fourier Transform (FFT)": {
-    "prefix": [
-      "cp-fft",
-      "cp-complex-fft"
-    ],
+    "prefix": "cp-poly-fft",
     "body": [
       "using cd = complex<double>;",
       "const double PI = acos(-1.0);",
@@ -194,14 +327,10 @@
       "    return res;",
       "}"
     ],
-    "description": "In-place iterative Radix-2 Cooley-Tukey complex FFT for polynomial multiplication."
+    "description": "In-place iterative Radix-2 Cooley-Tukey complex FFT for general polynomial multiplication."
   },
   "Arbitrary Modulus Convolution (MTT / Split FFT)": {
-    "prefix": [
-      "cp-mtt",
-      "cp-split-fft",
-      "cp-arbitrary-mod-conv"
-    ],
+    "prefix": "cp-poly-mtt",
     "body": [
       "// Multiplies two polynomials modulo any arbitrary modulus m using 4-FFT MTT",
       "inline vector<long long> convolution_arbitrary_mod(const vector<long long> &a, const vector<long long> &b, long long m) {",
@@ -245,13 +374,10 @@
       "    return res;",
       "}"
     ],
-    "description": "Arbitrary modulus polynomial convolution using 4-FFT complex splitting (MTT) for any prime or non-prime modulo (e.g. 10^9+7)."
+    "description": "Multiplies polynomials modulo any integer M (e.g. 10^9+7) using 4-FFT complex splitting."
   },
-  "All-Pairs Sums & Differences (Frequency Convolutions)": {
-    "prefix": [
-      "cp-all-pairs-sum",
-      "cp-freq-convolution"
-    ],
+  "All-Pairs Sums and Differences (Frequency Convolutions)": {
+    "prefix": "cp-poly-all-pairs-sum",
     "body": [
       "// Returns count of pairs (a_i, b_j) with sum s at index s",
       "inline vector<long long> all_pairs_sum(const vector<int> &a, const vector<int> &b) {",
@@ -275,13 +401,10 @@
       "    return multiply_fft(fa, fb);",
       "}"
     ],
-    "description": "Frequency convolution to compute counts of all pairwise sums and differences in O(V log V)."
+    "description": "Frequency convolution counting all pairwise sums a_i + b_j and differences a_i - b_j in O(V log V)."
   },
   "All Cyclic Scalar Products (Circular Convolution)": {
-    "prefix": [
-      "cp-cyclic-convolution",
-      "cp-circular-conv"
-    ],
+    "prefix": "cp-poly-cyclic-conv",
     "body": [
       "inline vector<long long> cyclic_scalar_product(const vector<long long> &a, const vector<long long> &b) {",
       "    int n = a.size();",
@@ -296,13 +419,10 @@
       "    return res;",
       "}"
     ],
-    "description": "Computes all cyclic shifts dot products (circular convolution) in O(n log n) by duplicating array."
+    "description": "Computes dot products with all cyclic shifts in O(n log n) via polynomial multiplication."
   },
   "Attaching Cyclic Binary Stripes (Conflict Avoidance)": {
-    "prefix": [
-      "cp-cyclic-binary-stripes",
-      "cp-conflict-avoidance"
-    ],
+    "prefix": "cp-poly-binary-stripes",
     "body": [
       "// Returns all valid cyclic shift offsets s where no index has 1 in both arrays",
       "inline vector<int> find_zero_conflict_shifts(const vector<long long> &a, const vector<long long> &b) {",
@@ -314,13 +434,10 @@
       "    return valid_shifts;",
       "}"
     ],
-    "description": "Finds all zero-conflict cyclic shift offsets for binary stripes in O(n log n)."
+    "description": "Finds all zero-conflict cyclic shift alignments for binary sequences in O(n log n)."
   },
   "String Matching with Wildcards using FFT": {
-    "prefix": [
-      "cp-wildcard-matching",
-      "cp-fft-string-match"
-    ],
+    "prefix": "cp-poly-wildcard-match",
     "body": [
       "// Returns 0-based start indices of all occurrences of pat in text (supporting wildcard '?')",
       "inline vector<int> string_matching_wildcard(const string &text, const string &pat, char wildcard = '?') {",
@@ -361,6 +478,6 @@
       "    return matches;",
       "}"
     ],
-    "description": "Pattern matching with wildcard characters in O((|T| + |P|) log(|T| + |P|)) using FFT polynomial convolutions."
+    "description": "Exact pattern matching with wildcard characters using Clifford-Clifford FFT in O((n+m) log(n+m))."
   }
 }

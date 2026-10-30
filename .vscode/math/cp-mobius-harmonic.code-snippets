@@ -1,0 +1,152 @@
+{
+  "Linear Sieve for Totient and M\u00f6bius (Phi & Mu)": {
+    "prefix": "cp-mobius-linear-sieve",
+    "body": [
+      "// Euler's Linear Sieve: computes phi and mu for all 1 <= i <= n in strictly O(n)",
+      "vector<int> spf, primes, phi, mu;",
+      "void sieve_phi_mu(int n) {",
+      "    spf.assign(n + 1, 0);",
+      "    phi.assign(n + 1, 0);",
+      "    mu.assign(n + 1, 0);",
+      "    primes.clear();",
+      "    phi[1] = mu[1] = 1;",
+      "    for (int i = 2; i <= n; i++) {",
+      "        if (!spf[i]) {",
+      "            spf[i] = i;",
+      "            primes.push_back(i);",
+      "            phi[i] = i - 1;",
+      "            mu[i] = -1;",
+      "        }",
+      "        for (int p : primes) {",
+      "            if (p > spf[i] || 1LL * i * p > n) break;",
+      "            spf[i * p] = p;",
+      "            if (i % p == 0) {",
+      "                phi[i * p] = phi[i] * p;",
+      "                mu[i * p] = 0;",
+      "                break;",
+      "            } else {",
+      "                phi[i * p] = phi[i] * (p - 1);",
+      "                mu[i * p] = -mu[i];",
+      "            }",
+      "        }",
+      "    }",
+      "}"
+    ],
+    "description": "Linear sieve evaluating Eulers totient phi(x) and M\u00f6bius function mu(x) up to N in strictly O(N) time."
+  },
+  "Linear Sieve Multi-Function Precomputor": {
+    "prefix": "cp-sieve-multi-func",
+    "body": [
+      "struct LinearSieve {",
+      "    int n;",
+      "    vector<int> spf, primes, phi, mu;",
+      "    LinearSieve(int n_ = 1) : n(n_), spf(n_ + 1, 0), phi(n_ + 1, 0), mu(n_ + 1, 0) {",
+      "        phi[1] = mu[1] = 1;",
+      "        for (int i = 2; i <= n; i++) {",
+      "            if (!spf[i]) spf[i] = i, primes.push_back(i), phi[i] = i - 1, mu[i] = -1;",
+      "            for (int p : primes) {",
+      "                if (p > spf[i] || (ll)i * p > n) break;",
+      "                spf[i * p] = p;",
+      "                if (i % p == 0) phi[i * p] = phi[i] * p, mu[i * p] = 0;",
+      "                else phi[i * p] = phi[i] * (p - 1), mu[i * p] = -mu[i];",
+      "            }",
+      "        }",
+      "    }",
+      "    bool is_prime(int x) const { return x >= 2 && spf[x] == x; }",
+      "    vector<pair<int, int>> factorize(int x) const {",
+      "        vector<pair<int, int>> f;",
+      "        while (x > 1) {",
+      "            int p = spf[x], c = 0;",
+      "            while (x % p == 0) x /= p, c++;",
+      "            f.push_back({p, c});",
+      "        }",
+      "        return f;",
+      "    }",
+      "    vector<int> divisors(int x) const {",
+      "        vector<int> d = {1};",
+      "        for (auto [p, e] : factorize(x)) {",
+      "            int sz0 = d.size();",
+      "            for (int k = 1, pk = 1; k <= e; k++) {",
+      "                pk *= p;",
+      "                for (int i = 0; i < sz0; i++) d.push_back(d[i] * pk);",
+      "            }",
+      "        }",
+      "        sort(d.begin(), d.end());",
+      "        return d;",
+      "    }",
+      "};"
+    ],
+    "description": "Linear sieve precomputing SPF, primes, mobius mu, totient phi, and divisor counts d(n) in O(N) time."
+  },
+  "Harmonic Lemma Loop (1D Quotient Chunking)": {
+    "prefix": "cp-harmonic-loop-1d",
+    "body": [
+      "for (long long l = 1, r; l <= ${1:n}; l = r + 1) {",
+      "    long long q = ${1:n} / l;",
+      "    r = ${1:n} / q;",
+      "    // For all i in [l, r], floor(${1:n} / i) == q",
+      "    ${0}",
+      "}"
+    ],
+    "description": "Iterates over intervals [l, r] where floor(n / i) is constant in O(sqrt(n)) time."
+  },
+  "Harmonic Lemma Loop (2D Quotient Chunking)": {
+    "prefix": "cp-harmonic-loop-2d",
+    "body": [
+      "for (long long l = 1, r; l <= min(${1:n}, ${2:m}); l = r + 1) {",
+      "    long long q1 = ${1:n} / l;",
+      "    long long q2 = ${2:m} / l;",
+      "    r = min(${1:n} / q1, ${2:m} / q2);",
+      "    // For all i in [l, r], floor(${1:n} / i) == q1 and floor(${2:m} / i) == q2",
+      "    ${0}",
+      "}"
+    ],
+    "description": "Simultaneous two-variable quotient chunking for floor(n / i) and floor(m / i) in O(sqrt(n) + sqrt(m)) time."
+  },
+  "Harmonic Lemma Loop with Range Limit K": {
+    "prefix": "cp-harmonic-loop-limit",
+    "body": [
+      "for (long long l = 1, r; l <= ${2:k}; l = r + 1) {",
+      "    long long q = ${1:n} / l;",
+      "    r = min((long long)${2:k}, ${1:n} / q);",
+      "    // For all i in [l, r], floor(${1:n} / i) == q",
+      "    ${0}",
+      "}"
+    ],
+    "description": "Harmonic quotient chunking bounded up to an upper limit k <= n in O(sqrt(n)) time."
+  },
+  "Sum of Divisor Counts (Quotient Chunking)": {
+    "prefix": "cp-harmonic-sum-counts",
+    "body": [
+      "// O(sqrt(n)) computes sum_{i=1}^n d(i) = sum_{d=1}^n floor(n / d)",
+      "inline long long sum_divisor_counts_up_to(long long n) {",
+      "    long long ans = 0;",
+      "    for (long long l = 1, r; l <= n; l = r + 1) {",
+      "        long long q = n / l;",
+      "        r = n / q;",
+      "        ans += (r - l + 1) * q;",
+      "    }",
+      "    return ans;",
+      "}"
+    ],
+    "description": "Computes sum_{i=1}^n d(i) = sum_{i=1}^n floor(n/i) in O(sqrt(n)) time via Dirichlet hyperbola method."
+  },
+  "Sum of Divisor Sums (Quotient Chunking)": {
+    "prefix": "cp-harmonic-sum-sums",
+    "body": [
+      "// O(sqrt(n)) computes sum_{i=1}^n sigma(i) = sum_{d=1}^n d * floor(n / d)",
+      "inline long long sum_divisor_sums_up_to(long long n) {",
+      "    long long ans = 0;",
+      "    for (long long l = 1, r; l <= n; l = r + 1) {",
+      "        long long q = n / l;",
+      "        r = n / q;",
+      "        long long count = r - l + 1;",
+      "        long long sum_range = (l + r) * count / 2;",
+      "        ans += sum_range * q;",
+      "    }",
+      "    return ans;",
+      "}"
+    ],
+    "description": "Computes sum_{i=1}^n sigma_1(i) = sum_{i=1}^n i * floor(n/i) in O(sqrt(n)) time via harmonic chunking."
+  }
+}
