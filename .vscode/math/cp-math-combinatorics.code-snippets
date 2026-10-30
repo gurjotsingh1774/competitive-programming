@@ -20,9 +20,9 @@
       "    return res;",
       "}"
     ],
-    "description": "Computes \\binom{n}{r} = \\frac{n(n-1)\u00b7s(n-r+1)}{r!} iteratively without overflow up to 64-bit limits."
+    "description": "Computes \\binom{n}{r} = \\frac{n(n-1)·s(n-r+1)}{r!} iteratively without overflow up to 64-bit limits."
   },
-  "Binomial Coefficients (\\binom{n}{r}): Pascal\u2019s Triangle DP": {
+  "Binomial Coefficients (\\binom{n}{r}): Pascal’s Triangle DP": {
     "prefix": [
       "cp-ncr-pascal",
       "cp-pascal-triangle"
@@ -42,7 +42,7 @@
       "    return C;",
       "}"
     ],
-    "description": "Computes binomial coefficients modulo m or for all pairs up to (n, r) using Pascal\u2019s identity: \\binom{n}{r} = \\binom{n-1}{r-1} + \\binom{n-1}{r}."
+    "description": "Computes binomial coefficients modulo m or for all pairs up to (n, r) using Pascal’s identity: \\binom{n}{r} = \\binom{n-1}{r-1} + \\binom{n-1}{r}."
   },
   "Catalan Numbers (C_n): Dynamic Programming": {
     "prefix": [
@@ -252,6 +252,54 @@
       "    mint stars_and_bars(int n, int k) { return k == 0 ? mint(n == 0) : C(n + k - 1, k - 1); }",
       "};"
     ],
-    "description": "Maintains factorials and inverse factorials, dynamically resizing (grow(n)) when larger query values are encountered. - C(n, r): Computes \\binom{n}{r} \u00b1od p. - P(n, r): Computes \\frac{n!}{(n-r)!} \u00b1od p. - catalan(n): ..."
+    "description": "Maintains factorials and inverse factorials, dynamically resizing (grow(n)) when larger query values are encountered. - C(n, r): Computes \\binom{n}{r} ±od p. - P(n, r): Computes \\frac{n!}{(n-r)!} ±od p. - catalan(n): ..."
+  },
+  "Binomial Coefficients (\\binom{n}{r}): Precomputed Factorials Modulo P": {
+    "prefix": [
+      "cp-ncr-mod",
+      "cp-factorials-mod",
+      "cp-ncr-precompute",
+      "cp-invfact"
+    ],
+    "body": [
+      "const long long MOD = 1e9 + 7;",
+      "",
+      "vector<long long> fact, invFact;",
+      "",
+      "inline long long power_mod(long long base, long long exp, long long mod = MOD) {",
+      "    long long res = 1;",
+      "    base %= mod;",
+      "    while (exp > 0) {",
+      "        if (exp & 1) res = (unsigned __int128)res * base % mod;",
+      "        base = (unsigned __int128)base * base % mod;",
+      "        exp >>= 1;",
+      "    }",
+      "    return res;",
+      "}",
+      "",
+      "void precompute_factorials(int n, long long mod = MOD) {",
+      "    fact.resize(n + 1);",
+      "    invFact.resize(n + 1);",
+      "    fact[0] = 1;",
+      "    for (int i = 1; i <= n; i++) {",
+      "        fact[i] = fact[i - 1] * i % mod;",
+      "    }",
+      "    invFact[n] = power_mod(fact[n], mod - 2, mod);",
+      "    for (int i = n; i >= 1; i--) {",
+      "        invFact[i - 1] = invFact[i] * i % mod;",
+      "    }",
+      "}",
+      "",
+      "inline long long nCr_mod(int n, int r, long long mod = MOD) {",
+      "    if (r < 0 || r > n) return 0;",
+      "    return fact[n] * invFact[r] % mod * invFact[n - r] % mod;",
+      "}",
+      "",
+      "inline long long nPr_mod(int n, int r, long long mod = MOD) {",
+      "    if (r < 0 || r > n) return 0;",
+      "    return fact[n] * invFact[n - r] % mod;",
+      "}"
+    ],
+    "description": "Precomputes factorial and inverse-factorial lookup tables up to n in O(N + \\log p) time, enabling O(1) evaluation of \\binom{n}{r} \\bmod p and \\frac{n!}{(n-r)!} \\bmod p without requiring a mint struct."
   }
 }
