@@ -98,6 +98,36 @@
     ],
     "description": "Solves a*x + b*y = gcd(a, b) and computes modular inverse in O(log(min(a, b)))."
   },
+  "Wilson's Theorem (Factorial Modulo P)": {
+    "prefix": "cp-mod-wilson",
+    "body": [
+      "// Wilson's Theorem: (p - 1)! == -1 == p - 1 (mod p) for prime p.",
+      "// Computes n! % p in O(p - n + log p) time when n is close to p (p - n <= 10^7).",
+      "// Useful when n is close to p (n < p) where standard O(n) factorial calculation would TLE.",
+      "inline long long factorial_mod_wilson(long long n, long long p) {",
+      "    if (n >= p) return 0;",
+      "    if (n == p - 1) return p - 1;",
+      "    // (p - 1)! = n! * (n + 1) * ... * (p - 1) == -1 (mod p)",
+      "    // => n! == -1 * inv((n + 1) * ... * (p - 1)) (mod p)",
+      "    long long prod = 1;",
+      "    for (long long i = n + 1; i < p; ++i) {",
+      "        prod = (unsigned __int128)prod * i % p;",
+      "    }",
+      "    // Fermat's Little Theorem: prod^(p - 2) == inv(prod) (mod p)",
+      "    auto power_mod = [](long long a, long long b, long long m) -> long long {",
+      "        long long res = 1;",
+      "        a %= m;",
+      "        for (; b > 0; b >>= 1, a = (unsigned __int128)a * a % m) {",
+      "            if (b & 1) res = (unsigned __int128)res * a % m;",
+      "        }",
+      "        return res;",
+      "    };",
+      "    long long inv_prod = power_mod(prod, p - 2, p);",
+      "    return (p - inv_prod) % p;",
+      "}"
+    ],
+    "description": "Computes n! mod p in O(p - n + log p) time via Wilson's Theorem ((p-1)! == -1 mod p) when n is close to prime p (p - n <= 10^7)."
+  },
   "Chinese Remainder Theorem (CRT)": {
     "prefix": "cp-mod-crt",
     "body": [

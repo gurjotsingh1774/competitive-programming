@@ -74,14 +74,17 @@ Designed for competitive programming on platforms like **Codeforces**, **AtCoder
 │   │   ├── cp-graph-flows.code-snippets
 │   │   ├── cp-graph-paths.code-snippets
 │   │   └── cp-graph-trees.code-snippets
-│   ├── math/                                   # Number theory, algebra, geometry (8 files, 75 snippets)
-│   │   ├── cp-algebra-polynomials.code-snippets
+│   ├── math/                                   # Number theory, algebra, polynomials, geometry (11 files, 95 snippets)
+│   │   ├── cp-algebra.code-snippets
 │   │   ├── cp-combinatorics.code-snippets
 │   │   ├── cp-diophantine-floorsum.code-snippets
+│   │   ├── cp-dirichlet-convolution.code-snippets
 │   │   ├── cp-divisors-gcd.code-snippets
 │   │   ├── cp-geometry.code-snippets
+│   │   ├── cp-min-25-sieve.code-snippets
 │   │   ├── cp-mobius-harmonic.code-snippets
 │   │   ├── cp-modular-arithmetic.code-snippets
+│   │   ├── cp-polynomials.code-snippets
 │   │   └── cp-primes-sieves.code-snippets
 │   └── templates/                              # Contest boilerplates & prelude (1 file, 3 snippets)
 │       └── cp-templates.code-snippets
@@ -262,15 +265,16 @@ Complete coverage of advanced modular arithmetic, linear algebra, and discrete t
 | | [cp-graph-flows.code-snippets](.vscode/graphs/cp-graph-flows.code-snippets) | **3** | Dinic Max Flow & Min Cut, Min-Cost Max-Flow (SPFA), Hopcroft-Karp Maximum Matching. |
 | | [cp-graph-paths.code-snippets](.vscode/graphs/cp-graph-paths.code-snippets) | **9** | BFS, Dijkstra, 0-1 BFS, Bellman-Ford, Floyd-Warshall, Kahn Topological Sort, Bipartite Coloring. |
 | | [cp-graph-trees.code-snippets](.vscode/graphs/cp-graph-trees.code-snippets) | **5** | Heavy-Light Decomposition (HLD), Centroid Decomposition, LCA (Binary Lifting), Euler Tour. |
-| **Math** | [cp-algebra-polynomials.code-snippets](.vscode/math/cp-algebra-polynomials.code-snippets) | **14** | Linear XOR Basis, Matrix Exponentiation, Gaussian Elimination, NTT, MTT, Inversion, Bostan-Mori, Lagrange, String Wildcards. |
-| | [cp-combinatorics.code-snippets](.vscode/math/cp-combinatorics.code-snippets) | **12** | Binomial coefficients (multiplicative, Pascal, modulo $p$), Catalan numbers, Permutations, Combinations. |
+| **Math** | [cp-algebra.code-snippets](.vscode/math/cp-algebra.code-snippets) | **3** | Linear XOR Basis over $\text{GF}(2)$, Matrix Exponentiation, Gaussian Elimination over $\mathbb{Z}_p$. |
+| | [cp-polynomials.code-snippets](.vscode/math/cp-polynomials.code-snippets) | **11** | NTT mod 998244353, Any-Mod MTT ($10^9+7$), Complex FFT, Series Inversion, Bostan-Mori, Lagrange, String Wildcards. |
+| | [cp-combinatorics.code-snippets](.vscode/math/cp-combinatorics.code-snippets) | **23** | Binomial coefficients ($nCr \bmod m$ prime/composite, Lucas, Granville), Catalan ($C_n$, $k$-fold Convolution), Legendre, PIE, Derangements, Divisor DP, Contribution, Product Trick, Binomial Sums (Mo's, Congruence, NTT). |
 | | [cp-diophantine-floorsum.code-snippets](.vscode/math/cp-diophantine-floorsum.code-snippets) | **6** | Two-variable and $N$-variable Linear Diophantine solvers, Frobenius problem, Floor Sum $\mathcal{O}(\log m)$. |
 | | [cp-divisors-gcd.code-snippets](.vscode/math/cp-divisors-gcd.code-snippets) | **9** | All Divisors (trial & harmonic sieve), Prime Factorization, GCD/LCM, Extended Euclidean algorithm. |
 | | [cp-geometry.code-snippets](.vscode/math/cp-geometry.code-snippets) | **8** | Point2D struct, Andrew’s Monotone Chain Convex Hull, Shoelace Polygon Area, Closest Pair of Points. |
 | | [cp-mobius-harmonic.code-snippets](.vscode/math/cp-mobius-harmonic.code-snippets) | **7** | Linear Sieve for $\phi$ and $\mu$, Harmonic Lemma quotient chunking ($O(\sqrt{N})$), Mertens function. |
-| | [cp-modular-arithmetic.code-snippets](.vscode/math/cp-modular-arithmetic.code-snippets) | **11** | Modular Integer (`mint`), Modular Exponentiation, Modular Inverse, CRT, Baby-Step Giant-Step, Tonelli-Shanks. |
+| | [cp-modular-arithmetic.code-snippets](.vscode/math/cp-modular-arithmetic.code-snippets) | **12** | Modular Integer (`mint`), Modular Exponentiation, Modular Inverse, Wilson's Theorem, CRT, Baby-Step Giant-Step, Tonelli-Shanks. |
 | | [cp-primes-sieves.code-snippets](.vscode/math/cp-primes-sieves.code-snippets) | **8** | Sieve of Eratosthenes, Linear Sieve (SPF), Segmented Sieve, Deterministic 64-bit Miller-Rabin, Pollard's Rho. |
-| **Total** | **36 Files** | **274** | **100% Modern C++17/20, Zero Compilation Warnings** |
+| **Total** | **37 Files** | **286** | **100% Modern C++17/20, Zero Compilation Warnings** |
 
 ---
 
@@ -390,21 +394,25 @@ Complete coverage of advanced modular arithmetic, linear algebra, and discrete t
 </details>
 
 <details>
-<summary><b>5. Mathematics, Number Theory & Geometry (8 files, 75 snippets)</b></summary>
+<summary><b>5. Mathematics, Number Theory & Geometry (11 files, 95 snippets)</b></summary>
 
-- **Algebra & Polynomials (`cp-algebra-polynomials`)**:
+- **Linear Algebra & Matrices (`cp-algebra`)**:
   - `cp-alg-xor-basis`: Linear XOR basis over $\text{GF}(2)$ (insert, max XOR, $k$-th smallest).
   - `cp-alg-matrix`: Matrix multiplication with cache optimization and binary matrix exponentiation.
   - `cp-alg-solve-linear`: Gaussian elimination over $\mathbb{Z}_p$ for linear systems.
+- **Polynomials & Transforms (`cp-polynomials`)**:
   - `cp-poly-ntt`: Number Theoretic Transform mod $998244353$.
+  - `cp-poly-fft`: Complex Fast Fourier Transform over $\mathbb{C}$.
+  - `cp-poly-conv`: Polynomial convolution via NTT.
   - `cp-poly-mtt`: Arbitrary modulus convolution (Split FFT) for $M \le 10^9$.
   - `cp-poly-inv`: Formal power series inversion via Newton's method.
   - `cp-poly-bostan-mori`: Bostan-Mori algorithm for $k$-th term of linear recurrence.
   - `cp-poly-lagrange`: Linear time Lagrange polynomial interpolation over consecutive points.
-  - `cp-poly-all-pairs-sum`, `cp-poly-cyclic-conv`, `cp-poly-wildcard-match`: Frequency convolutions, circular scalar products, and wildcard string matching.
+  - `cp-poly-all-pairs-sum`, `cp-poly-cyclic-conv`, `cp-poly-binary-stripes`, `cp-poly-wildcard-match`: Frequency convolutions, circular scalar products, conflict avoidance, and wildcard string matching.
 - **Modular Arithmetic (`cp-modular-arithmetic`)**:
   - `cp-mint`: Modular integer (`mint`) struct with automatic reduction, division, and inverse.
   - `cp-power-mod`: Fast binary modular exponentiation.
+  - `cp-mod-wilson`: Wilson's Theorem factorial reduction ($n! \bmod p$ in $\mathcal{O}(p - n + \log p)$).
   - `cp-crt`: Chinese Remainder Theorem solver.
   - `cp-baby-giant`: Baby-Step Giant-Step discrete logarithm solver.
   - `cp-tonelli-shanks`: Tonelli-Shanks quadratic residue / modular square root solver.
@@ -417,7 +425,18 @@ Complete coverage of advanced modular arithmetic, linear algebra, and discrete t
   - Linear sieve computing Euler’s Totient ($\phi$) and Möbius ($\mu$).
   - Harmonic Lemma 1D and 2D quotient chunking in $\mathcal{O}(\sqrt{N})$ time.
 - **Combinatorics & Diophantine (`cp-combinatorics`, `cp-diophantine-floorsum`)**:
-  - Binomial coefficients, Catalan numbers, combinations table.
+  - Binomial coefficients, Catalan numbers (`cp-comb-catalan-dp`, `cp-comb-catalan-formula`), combinations table (`cp-comb-table`), Lucas' theorem (`cp-comb-lucas`).
+  - `cp-comb-catalan-convolution`: $k$-th Catalan convolution $C^{(k)}_n$ and bracket sequence prefix completions (CSES Bracket Sequences II).
+  - `cp-comb-legendre`: Legendre's formula $v_p(n!)$ and prime power multiplicity of $\binom{n}{r}$.
+  - `cp-comb-ncr-arbitrary`: $\binom{n}{r} \bmod m$ for arbitrary composite $m$ and prime powers $p^a$ via Andrew Granville and CRT.
+  - `cp-comb-pie`: Principle of Inclusion-Exclusion bitmask template and Binomial Inversion (exact $k$ from at least $k$).
+  - `cp-comb-derangements`: Derangement numbers $D[n]$ modulo $p$ and constructive array derangement generator for multisets ($\max freq \le n/2$).
+  - `cp-comb-divisor-pie`: Divisor Inclusion-Exclusion DP (backwards multiple DP in $\mathcal{O}(M \log M)$ without Möbius).
+  - `cp-comb-contribution`: Contribution Technique for subarray sum $\mathcal{O}(n)$, subarray min/max sums via monotonic stack $\mathcal{O}(n)$, and subset ranges $\mathcal{O}(n \log n)$.
+  - `cp-comb-product-trick`: Product Trick combinatorial rephrasing for partition product linear DP $\mathcal{O}(n)$ and ball-coloring operations DP $\mathcal{O}(n^2)$.
+  - `cp-comb-sum-mo`: Offline range sum queries $\sum_{i=l}^r \binom{n}{i} \pmod p$ via Mo's algorithm on combinations in $\mathcal{O}((N + Q)\sqrt{N})$.
+  - `cp-comb-sum-congruence`: Sum of $\binom{n}{i}$ over $i \equiv r \pmod m$ via cyclic polynomial exponentiation $\bmod (x^m - 1)$ in $\mathcal{O}(m^2 \log n)$.
+  - `cp-comb-sum-aik`: Sum of $\binom{a_i}{k}$ for all $k \in [0, \max_k]$ via polynomial NTT frequency cross-correlation in $\mathcal{O}(M \log M)$.
   - 2-variable and $N$-variable Linear Diophantine solvers.
   - Frobenius coin problem solver.
   - Floor Sum $\sum_{i=0}^{n-1} \lfloor \frac{ai + b}{m} \rfloor$ in $\mathcal{O}(\log m)$ time.
